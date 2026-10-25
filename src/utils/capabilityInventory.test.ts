@@ -168,6 +168,45 @@ describe('public-safe capability inventory', () => {
     expect(validateCapabilityInventory(inventory)).toEqual(inventory);
   });
 
+  it('round-trips union argument types through validation', () => {
+    const inventory = createCapabilityInventory({
+      observedAt: '2026-08-17T22:00:00.000Z',
+      testedEndpoint: 'https://example.com/mcp',
+      route: 'direct',
+      authentication: 'unauthenticated',
+      statuses,
+      discovered: {
+        tools: [{
+          name: 'nullable_argument',
+          inputSchema: {
+            properties: {
+              password: { type: ['string', 'null'] },
+            },
+            required: ['password'],
+          },
+        }],
+        resources: [],
+        resourceTemplates: [],
+        prompts: [],
+      },
+    });
+
+    expect(inventory.tools.items[0].input).toEqual([
+      { name: 'password', type: 'null | string', required: true },
+    ]);
+    expect(validateCapabilityInventory(inventory)).toEqual(inventory);
+    expect(() => validateCapabilityInventory({
+      ...inventory,
+      tools: {
+        ...inventory.tools,
+        items: [{
+          ...inventory.tools.items[0],
+          input: [{ name: 'password', type: 'string | null', required: true }],
+        }],
+      },
+    })).toThrow('unsafe or non-canonical');
+  });
+
   it('marks malformed, duplicate, truncated, and oversized sections partial', () => {
     const tools = Array.from({ length: CAPABILITY_INVENTORY_ITEM_LIMIT + 3 }, (_, index) => ({
       name: `tool_${String(index).padStart(3, '0')}`,

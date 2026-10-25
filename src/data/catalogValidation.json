@@ -3911,5 +3911,17 @@
     "authorizationServers": [
       "https://auth.qencode.com/"
     ]
+  },
+  {
+    "serverId": "deed-page",
+    "status": "online",
+    "transport": "streamable-http",
+    "authType": "none",
+    "requiresOAuth": false,
+    "protocolEra": "stateful",
+    "checkedAt": "2026-10-25T16:32:56.345Z",
+    "message": "Negotiated stateful MCP 2025-06-18 at https://deed.page/mcp; detected transport streamable-http; authentication none",
+    "validatedUrl": "https://deed.page/mcp",
+    "protocolVersion": "2025-06-18"
   }
 ]

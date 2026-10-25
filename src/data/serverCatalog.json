@@ -12445,5 +12445,34 @@
     "registryVersion": "1.2.0",
     "registryUrl": "https://registry.modelcontextprotocol.io/v0.1/servers/com.qencode%2Fqencode/versions/1.2.0",
     "sourceUrl": "https://github.com/Qencode-Corp/mcp"
+  },
+  {
+    "id": "deed-page",
+    "name": "deed.page",
+    "url": "https://deed.page/mcp",
+    "description": "Publishes HTML or a static folder to a permanent public URL, then updates, versions, restores, or deletes the site, with tools for custom domains, access settings and webhooks. No authentication to connect or publish a first site; later calls use the bearer token returned by publish_site.",
+    "category": "Cloud",
+    "tags": [
+      "hosting",
+      "static-sites",
+      "html",
+      "deployments",
+      "no-auth"
+    ],
+    "listingSource": {
+      "kind": "publisher",
+      "url": "https://deed.page/docs"
+    },
+    "transport": "streamable-http",
+    "requiresOAuth": false,
+    "authType": "none",
+    "exactEndpointOnly": true,
+    "logoUrl": "/server-logos/deed-page.svg",
+    "logoSourceUrl": "https://deed.page/icon.svg",
+    "logoSourceKind": "official-site",
+    "logoRetrievedAt": "2026-10-25",
+    "logoLicenseNote": "deed.page icon served from the publisher's own site; trademark rights remain with Avatar 8 LLC.",
+    "homepageUrl": "https://deed.page",
+    "sourceUrl": "https://github.com/f-o-x11/deed-page-skill"
   }
 ]

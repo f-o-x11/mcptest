@@ -2266,6 +2266,789 @@
       "items": []
     }
   },
+  "deed-page": {
+    "version": 1,
+    "observedAt": "2026-10-25T16:32:56.186Z",
+    "provenance": {
+      "testedEndpoint": "https://deed.page/mcp",
+      "route": "direct"
+    },
+    "authentication": "unauthenticated",
+    "tools": {
+      "status": "partial",
+      "observedCount": 25,
+      "retainedCount": 25,
+      "omittedCount": 0,
+      "paginationComplete": true,
+      "items": [
+        {
+          "name": "add_domain",
+          "description": "Attaches a hostname to a slug owned by the token and returns the DNS records to create: a CNAME for a subdomain, an A record or an ALIAS record for an apex (one of those, not both), and every TXT record. Inputs: slug, domain, and token. Status starts at pending_dns until DNS and the certificate are ready. Free allows 1 hostname, Hobby 3, Pro 20. deed.page names are rejected.",
+          "input": [
+            {
+              "name": "domain",
+              "type": "string",
+              "description": "Hostname to attach, such as docs.example.com or example.com. No scheme or path.",
+              "required": true
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug you own.",
+              "required": true
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "create_webhook",
+          "description": "Registers an http or https URL for the events site.published, site.version_restored, site.deleted, site.taken_down, domain.active, and report.received. Inputs: url, optional events, and token. Returns the webhook id and an HMAC secret once. Free allows 1 webhook, Hobby 5, Pro 20. Private, internal, and localhost targets are rejected. Delivery is best-effort, with up to 3 attempts. API documentation: [REDACTED URI]",
+          "input": [
+            {
+              "name": "events",
+              "type": "array",
+              "description": "Events to send. Omit for all of them.",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            },
+            {
+              "name": "url",
+              "type": "string",
+              "description": "Public http or https URL on port 80 or 443.",
+              "required": true
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "delete_site",
+          "description": "Permanently removes a slug owned by the token and detaches its custom hostnames. The slug becomes available again. Inputs: slug and token.",
+          "input": [
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug you own.",
+              "required": true
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "delete_webhook",
+          "description": "Deletes one webhook. Inputs: id (whk_...) and token.",
+          "input": [
+            {
+              "name": "id",
+              "type": "string",
+              "description": "Webhook id (whk_...).",
+              "required": true
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "domain_status",
+          "description": "Returns the verification status of a custom domain and refreshes verification, DNS config, and certificate state. Inputs: slug, domain, and token. status is pending_dns, verifying, issuing_cert, active, or error. dns_records are the records to create. An error includes the reason.",
+          "input": [
+            {
+              "name": "domain",
+              "type": "string",
+              "description": "Hostname to check.",
+              "required": true
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug the hostname is attached to.",
+              "required": true
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "finalize_upload",
+          "description": "Checks uploaded hashes, screens the new bytes, and commits one version under the slug lock. Inputs: session (upl_...), optional expected_version, via, heard_from, and token. A stale expected_version returns version_conflict and writes nothing. A bad hash returns hash_mismatch. An expired session returns session_expired.",
+          "input": [
+            {
+              "name": "expected_version",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "heard_from",
+              "type": "string",
+              "description": "Optional. Where you or your user found deed.page, such as a skill repo, a directory, a blog post, X, or a friend. Free text, at most 200 characters. An email address, IP address, or phone number is stored as [redacted]. A URL or hostname is kept. Omit it and signup continues.",
+              "required": false
+            },
+            {
+              "name": "session",
+              "type": "string",
+              "description": "Upload session id (upl_...).",
+              "required": true
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            },
+            {
+              "name": "via",
+              "type": "string",
+              "description": "Optional label stored with the publish. At most 80 characters. An IP address, a URL, or an email address is not stored. A non-empty value replaces the X-Via header.",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "get_manifest",
+          "description": "Returns the canonical manifest for a site version: paths, sha256, sizes, version, slug, and created_at, plus an Ed25519 signature. signature is null when the server has no signing key. Inputs: slug, and optional version. When version is omitted, the result is the live site. Public keys are published at /.well-known/deed-signing-keys.json. No token is required.",
+          "input": [
+            {
+              "name": "slug",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "version",
+              "type": "string",
+              "description": "Optional retained version, such as \"v2\". Omit for the live version.",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "get_site",
+          "description": "Returns whether a slug is live, plus its URL, version, size, and timestamps. Input: slug. No token is required.",
+          "input": [
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug to look up.",
+              "required": true
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "get_upgrade_link",
+          "description": "Creates a Stripe Checkout URL that upgrades this token's owner to Hobby ($3/mo) or Pro ($15/mo). Call it when the user asks to upgrade, or right after a tool error that has upgrade_url / user_message (a plan limit). Show the returned checkout_url (or user_message) to the user: a human opens it and pays; never open or pay it yourself. When payment completes the same token gets the higher limits automatically. Inputs: plan (hobby or pro; omitted means the next plan up), token, optional how_heard (at most 200 characters, stored on the owner), and optional upgrade_trigger (the limit field from the",
+          "input": [
+            {
+              "name": "how_heard",
+              "type": "string",
+              "description": "Optional note, at most 200 characters. Stored on the owner.",
+              "required": false
+            },
+            {
+              "name": "plan",
+              "type": "string",
+              "description": "Plan to buy. Omit for the next plan above the current one (Free -> hobby, Hobby -> pro).",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            },
+            {
+              "name": "upgrade_trigger",
+              "type": "string",
+              "description": "The limit field of the plan-limit error that sent you here (for example publish_rate or quota_sites), custom_domain_limit, or manual.",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "list_domains",
+          "description": "Returns custom hostnames on one slug, or on every site the token owns when slug is omitted. Inputs: token, and optional slug. Status is the last checked value.",
+          "input": [
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Optional slug you own. Omit to list every hostname on this token.",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "list_sites",
+          "description": "Returns every live site owned by the token, with URLs and versions. Input: token, or an Authorization bearer [REDACTED]",
+          "input": [
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "list_versions",
+          "description": "Returns every retained version of a slug owned by the token, newest first. Inputs: slug and token. Each entry includes version, created_at, file_count, bytes, kind (publish, merge, or restore), restored_from, and a public permalink. Free keeps 10 versions, Hobby 50, Pro unlimited.",
+          "input": [
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug you own.",
+              "required": true
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "list_webhooks",
+          "description": "Returns the webhook URLs registered for the token. Secrets are not included. Input: token.",
+          "input": [
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "plan_upload",
+          "description": "Accepts a file manifest and returns which hashes are already stored, a direct upload URL for each missing hash, and a session id. Inputs: files as {path, sha256, size, content_type?}, and optional slug, spa, merge, ttl_seconds, expected_version, via, heard_from, and token. Applies when the files are larger than about 4 MB, or when each sha256 is already known. Does not publish by itself. Per-site size limits are unchanged.",
+          "input": [
+            {
+              "name": "expected_version",
+              "type": "string",
+              "description": "Live version this upload must match, such as \"v3\".",
+              "required": false
+            },
+            {
+              "name": "files",
+              "type": "array",
+              "description": "Manifest entries. sha256 is 64 lowercase hex characters. size is the byte length.",
+              "required": true
+            },
+            {
+              "name": "heard_from",
+              "type": "string",
+              "description": "Optional. Where you or your user found deed.page, such as a skill repo, a directory, a blog post, X, or a friend. Free text, at most 200 characters. An email address, IP address, or phone number is stored as [redacted]. A URL or hostname is kept. Omit it and signup continues.",
+              "required": false
+            },
+            {
+              "name": "merge",
+              "type": "boolean",
+              "description": "Overlay these paths on the live site.",
+              "required": false
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Exact slug, or omit for a random one.",
+              "required": false
+            },
+            {
+              "name": "spa",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            },
+            {
+              "name": "ttl_seconds",
+              "type": "integer",
+              "required": false
+            },
+            {
+              "name": "via",
+              "type": "string",
+              "description": "Optional label stored with the publish. At most 80 characters. An IP address, a URL, or an email address is not stored. A non-empty value replaces the X-Via header.",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "publish_site",
+          "description": "Publishes files to a live permanent URL at a slug. Inputs: files (required), and optional slug, spa, ttl_seconds, merge, expected_version, via, heard_from, token, listed, category, tags, title, and description. Paths are stored exactly. Returns url, path_url, slug, version, listing, and token on the first anonymous publish. On deed.page, url and path_url are both [REDACTED URI] A lost token has no recovery unless an optional recovery email was attached. When expected_version does not match the live version, the result is version_conflict and nothing is written. A racing publish of t",
+          "input": [
+            {
+              "name": "category",
+              "type": "string",
+              "description": "Gallery category. Required when listed is true.",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "description": "Gallery description, at most 300 characters. Required when listed is true.",
+              "required": false
+            },
+            {
+              "name": "expected_version",
+              "type": "string",
+              "description": "Live version this write is based on, such as \"v3\". If the slug is no longer at that version, the result is version_conflict and nothing is written. A racing publish of the same slug returns version_conflict even when this is omitted.",
+              "required": false
+            },
+            {
+              "name": "files",
+              "type": "object",
+              "description": "Path map, or an array of {path, content} or {path, base64}. Paths are stored exactly as given (a single top-level directory is not removed). Text as a string, binary as {\"base64\":\"...\"}. Example: {\"index.html\":\"<!doctype html><h1>Hi</h1>\",\"img/logo.png\":{\"base64\":\"iVBOR...\"}}. Any other array is rejected.",
+              "required": true
+            },
+            {
+              "name": "heard_from",
+              "type": "string",
+              "description": "Optional. Where you or your user found deed.page, such as a skill repo, a directory, a blog post, X, or a friend. Free text, at most 200 characters. An email address, IP address, or phone number is stored as [redacted]. A URL or hostname is kept. Omit it and signup continues.",
+              "required": false
+            },
+            {
+              "name": "listed",
+              "type": "boolean",
+              "description": "Opt into the public gallery. Default false. false removes the slug immediately. Password-protected sites cannot be listed.",
+              "required": false
+            },
+            {
+              "name": "merge",
+              "type": "boolean",
+              "description": "Add or overwrite only these exact paths on the existing site. Paths omitted from this call are left unchanged. Nothing is moved to the site root.",
+              "required": false
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Exact slug matching ^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$ (lowercase letters, digits, hyphens, 1-63, no leading or trailing hyphen). Invalid slugs return slug_invalid and are not rewritten. Reserved names (hello, my-page, www, api, docs, admin, mcp, blog, app, status, and other docs examples) return slug_reserved on a new claim. A token that already owns one can still update it. Omit for a random slug.",
+              "required": false
+            },
+            {
+              "name": "spa",
+              "type": "boolean",
+              "description": "Serve index.html for unknown paths (single-page apps).",
+              "required": false
+            },
+            {
+              "name": "tags",
+              "type": "array",
+              "description": "Up to 5 tags. Each tag is lowercase letters, digits, and hyphens, at most 32 characters.",
+              "required": false
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "description": "Gallery title, at most 80 characters. Required when listed is true.",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            },
+            {
+              "name": "ttl_seconds",
+              "type": "integer",
+              "description": "Opt-in expiry in seconds. Omit for a permanent site.",
+              "required": false
+            },
+            {
+              "name": "via",
+              "type": "string",
+              "description": "Optional label stored with the publish. At most 80 characters. An IP address, a URL, or an email address is not stored. A non-empty value replaces the X-Via header.",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "remove_domain",
+          "description": "Removes a hostname so requests to that host no longer serve the site. Inputs: domain, optional slug, and token. When slug is set, the hostname must already be attached to that slug.",
+          "input": [
+            {
+              "name": "domain",
+              "type": "string",
+              "description": "Hostname to remove.",
+              "required": true
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Optional slug. When set, the hostname must be attached to that slug.",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "restore_version",
+          "description": "Creates a new version whose files equal a retained version, without uploading those files again. Inputs: slug, version, optional expected_version, and token. When expected_version does not match the live version, the result is version_conflict and nothing is written. The previous permalink keeps serving until retention drops it.",
+          "input": [
+            {
+              "name": "expected_version",
+              "type": "string",
+              "description": "Live version this restore is based on, such as \"v4\". A mismatch returns version_conflict.",
+              "required": false
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug you own.",
+              "required": true
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            },
+            {
+              "name": "version",
+              "type": "string",
+              "description": "Version to copy forward, such as \"v2\".",
+              "required": true
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "revoke_token",
+          "description": "Revokes owner tokens. Inputs: token, and optional scope. Scope \"current\" (the default) revokes the token that was sent. Scope \"all\" revokes every token for that principal, including any overlap window. A later request with a revoked token returns 401 token_revoked, which is distinct from 403 suspended. Sites stay online. Without a recovery email, a revoked token cannot update them.",
+          "input": [
+            {
+              "name": "scope",
+              "type": "string",
+              "description": "current revokes only this token. all revokes every token for the principal. Default current.",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "rotate_token",
+          "description": "Issues a new token for the same principal. Every site carries over. Inputs: token, and optional overlap_seconds from 0 to 300. The previous token stops working immediately when overlap_seconds is omitted or 0. During a non-zero overlap window both tokens work. After that window the previous token returns 401 token_revoked. The new token is returned once.",
+          "input": [
+            {
+              "name": "overlap_seconds",
+              "type": "integer",
+              "description": "Seconds the previous token keeps working so an in-flight deploy can finish. Omit or 0 to invalidate it immediately. Maximum 300.",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "set_badge",
+          "description": "Free-plan sites show a small 'Published with deed.page' link in the bottom-right corner; Hobby and Pro never show it. Inputs: show (boolean), optional slug, and token. With slug, the setting applies to that site; without slug, it applies to every site of the token. show false hides the badge, show true shows it again. Returns the stored setting and whether the badge is shown. Writes only the setting on deed.page and contacts no outside system.",
+          "input": [
+            {
+              "name": "show",
+              "type": "boolean",
+              "description": "false hides the badge; true shows it again.",
+              "required": true
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug you own. Omit to apply to every site of this token.",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "set_listing",
+          "description": "Sets or clears the public gallery listing for a slug. Inputs: slug, listed, and when listed is true a category, title, description, and optional tags (at most 5), plus token. Returns listed, status, category, tags, title, and description. listed false removes the slug from the gallery immediately. Password-protected sites cannot be listed. A new version of the site runs the gallery checks again. Text is checked on deed.page, and also with the OpenAI moderation API when OPENAI_API_KEY is set.",
+          "input": [
+            {
+              "name": "category",
+              "type": "string",
+              "description": "Gallery category. Required when listed is true.",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "description": "Gallery description, at most 300 characters. Required when listed is true.",
+              "required": false
+            },
+            {
+              "name": "listed",
+              "type": "boolean",
+              "description": "Opt into the public gallery. Default false. false removes the slug immediately. Password-protected sites cannot be listed.",
+              "required": true
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug you own.",
+              "required": true
+            },
+            {
+              "name": "tags",
+              "type": "array",
+              "description": "Up to 5 tags. Each tag is lowercase letters, digits, and hyphens, at most 32 characters.",
+              "required": false
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "description": "Gallery title, at most 80 characters. Required when listed is true.",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "set_site_access",
+          "description": "Changes the access setting stored for a slug on deed.page. Inputs: slug, password, and token. password is 8 to 200 characters, or null to clear the password. The call writes a scrypt hash into the site record on deed.page, or removes that hash, and contacts no outside system. Setting a password is available on Hobby and Pro; Free returns plan_required. Clearing is allowed on every plan.",
+          "input": [
+            {
+              "name": "password",
+              "type": "null | string",
+              "description": "New password, or null to clear the password and make the site public.",
+              "required": true
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug you own.",
+              "required": true
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "site_analytics",
+          "description": "Returns owner-only cookieless counts for a slug: views per UTC day, top paths, top referrer hosts, and AI crawler counts by user-agent family. Inputs: slug, optional from and to as YYYY-MM-DD (default the last 7 days, maximum 90), and token. The accuracy field describes under-counting. No raw IP or full user agent is stored.",
+          "input": [
+            {
+              "name": "from",
+              "type": "string",
+              "description": "First UTC day, YYYY-MM-DD. Default is 6 days before to.",
+              "required": false
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug you own.",
+              "required": true
+            },
+            {
+              "name": "to",
+              "type": "string",
+              "description": "Last UTC day, YYYY-MM-DD. Default is today.",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "update_site",
+          "description": "Replaces the files of a slug owned by the token, or, when merge is true, adds and overwrites only the paths sent. Inputs: slug, files, and optional spa, merge, expected_version, via, token, listed, category, tags, title, and description. Returns url, path_url, slug, listing, and a new version. When expected_version does not match the live version, the result is version_conflict and nothing is written. Two racing updates return version_conflict even without expected_version. listed defaults to false. Password-protected sites cannot be listed. A new version of a listed slug runs the gallery chec",
+          "input": [
+            {
+              "name": "category",
+              "type": "string",
+              "description": "Gallery category. Required when listed is true.",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "description": "Gallery description, at most 300 characters. Required when listed is true.",
+              "required": false
+            },
+            {
+              "name": "expected_version",
+              "type": "string",
+              "description": "Live version this update is based on, such as \"v3\". If the site has moved on, the call returns version_conflict with no write. Omit it and a concurrent update still returns version_conflict rather than dropping files.",
+              "required": false
+            },
+            {
+              "name": "files",
+              "type": "object",
+              "description": "Path map, or an array of {path, content} or {path, base64}. Paths are stored exactly as given (a single top-level directory is not removed). Text as a string, binary as {\"base64\":\"...\"}. Example: {\"index.html\":\"<!doctype html><h1>Hi</h1>\",\"img/logo.png\":{\"base64\":\"iVBOR...\"}}. Any other array is rejected.",
+              "required": true
+            },
+            {
+              "name": "listed",
+              "type": "boolean",
+              "description": "Opt into the public gallery. Default false. false removes the slug immediately. Password-protected sites cannot be listed.",
+              "required": false
+            },
+            {
+              "name": "merge",
+              "type": "boolean",
+              "description": "Keep every path you do not send, and add or overwrite only these exact paths.",
+              "required": false
+            },
+            {
+              "name": "slug",
+              "type": "string",
+              "description": "Slug you own. Must match ^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$. Not rewritten. Reserved slugs are rejected.",
+              "required": true
+            },
+            {
+              "name": "spa",
+              "type": "boolean",
+              "description": "Serve index.html for unknown paths.",
+              "required": false
+            },
+            {
+              "name": "tags",
+              "type": "array",
+              "description": "Up to 5 tags. Each tag is lowercase letters, digits, and hyphens, at most 32 characters.",
+              "required": false
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "description": "Gallery title, at most 80 characters. Required when listed is true.",
+              "required": false
+            },
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            },
+            {
+              "name": "via",
+              "type": "string",
+              "description": "Optional label stored with the publish. At most 80 characters. An IP address, a URL, or an email address is not stored. A non-empty value replaces the X-Via header.",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        },
+        {
+          "name": "whoami",
+          "description": "Returns the plan, limits, the number of sites the token owns, and the number of custom hostnames attached. Input: token.",
+          "input": [
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Bearer [REDACTED] returned by your first publish (deed_tok_...). Optional if the MCP client sends Authorization=[REDACTED]",
+              "required": false
+            }
+          ],
+          "outputSchema": false
+        }
+      ]
+    },
+    "resources": {
+      "status": "complete",
+      "observedCount": 0,
+      "retainedCount": 0,
+      "omittedCount": 0,
+      "paginationComplete": true,
+      "items": []
+    },
+    "resourceTemplates": {
+      "status": "unsupported",
+      "observedCount": 0,
+      "retainedCount": 0,
+      "omittedCount": 0,
+      "paginationComplete": true,
+      "items": []
+    },
+    "prompts": {
+      "status": "complete",
+      "observedCount": 0,
+      "retainedCount": 0,
+      "omittedCount": 0,
+      "paginationComplete": true,
+      "items": []
+    }
+  },
   "deepwiki": {
     "version": 1,
     "observedAt": "2026-10-21T13:00:13.039Z",

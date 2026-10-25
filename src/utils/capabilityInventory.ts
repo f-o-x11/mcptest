@@ -132,6 +132,11 @@ const record = (value: unknown): Record<string, unknown> | undefined => (
 
 const safeType = (value: unknown): string | undefined => {
   if (typeof value === 'string' && SCHEMA_TYPES.has(value)) return value;
+  // Union types are stored as a sorted ' | ' list; accept that canonical form so
+  // re-validating a stored inventory is idempotent.
+  if (typeof value === 'string' && value.includes(' | ')) {
+    return safeType(value.split(' | ')) === value ? value : undefined;
+  }
   if (Array.isArray(value)) {
     const types = [...new Set(value.filter((item): item is string => (
       typeof item === 'string' && SCHEMA_TYPES.has(item)
